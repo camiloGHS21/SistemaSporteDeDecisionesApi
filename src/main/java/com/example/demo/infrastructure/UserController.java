@@ -7,8 +7,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +22,7 @@ import com.example.demo.infrastructure.Auth.LoginRequest;
 import com.example.demo.infrastructure.Auth.LoginResponse;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api")
 public class UserController {
 
@@ -51,5 +54,18 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtTokenProvider.generateToken((UserDetails) authentication.getPrincipal());
         return ResponseEntity.ok(new LoginResponse(jwt));
+    }
+
+    @PostMapping("/auth/validate")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
+        String jwt = token.substring(7); // Remove "Bearer " prefix
+        String username = jwtTokenProvider.extractUsername(jwt);
+        UserDetails userDetails = userService.loadUserByUsername(username);
+
+        if (jwtTokenProvider.isTokenValid(jwt, userDetails)) {
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+        }
     }
 }
