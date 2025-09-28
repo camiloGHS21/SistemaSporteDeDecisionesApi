@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/oecd-data")
 public class OecdDataController {
 
