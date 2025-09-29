@@ -1,0 +1,61 @@
+package com.example.demo.application.file;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.demo.application.validation.ValidationService;
+import com.example.demo.domain.file.FileDataRepository;
+import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.application.file.AbstractFileProcessingService;
+
+import jakarta.validation.Validator;
+
+
+
+@Service("excelFileProcessingService")
+public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingService {
+
+
+    @Autowired
+    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService) {
+        super(fileDataRepository, validator, validationService);
+    }
+
+
+    @Override
+    protected List<ValidatedDataRow> parseFile(MultipartFile file) {
+        System.out.println("Processing Excel file: " + file.getOriginalFilename());
+        List<ValidatedDataRow> dataRows = new ArrayList<>();
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+            for (Row row : sheet) {
+                // Omitir la fila de la cabecera
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+                ValidatedDataRow dataRow = new ValidatedDataRow();
+                dataRow.setName(row.getCell(0).getStringCellValue());
+                dataRow.setValue((int) row.getCell(1).getNumericCellValue());
+                dataRows.add(dataRow);
+            }
+        } catch (IOException e) {
+            // En una aplicación real, esto debería ser manejado por un sistema de logging.
+            e.printStackTrace();
+        }
+        return dataRows;
+    }
+
+    @Override
+    protected String getFileType() {
+        return "EXCEL";
+    }
+}
