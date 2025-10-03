@@ -12,27 +12,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import com.example.demo.application.validation.ValidationService;
-import com.example.demo.application.file.FileProcessingService;
-
-
+import com.example.demo.domain.core.DatoIndicadorService;
 
 public abstract class AbstractFileProcessingService implements FileProcessingService {
 
-  
     private final FileDataRepository fileDataRepository;
-   
     private final Validator validator;
-  
     private final ValidationService validationService;
+    private final DatoIndicadorService datoIndicadorService; // Inyectar el nuevo servicio
 
- 
-    public AbstractFileProcessingService(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService) {
+    public AbstractFileProcessingService(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
         this.fileDataRepository = fileDataRepository;
         this.validator = validator;
         this.validationService = validationService;
+        this.datoIndicadorService = datoIndicadorService; // Asignar en el constructor
     }
 
-   
     @Override
     public List<String> processFile(MultipartFile file) {
         List<ValidatedDataRow> dataRows = parseFile(file);
@@ -49,22 +44,23 @@ public abstract class AbstractFileProcessingService implements FileProcessingSer
         }
 
         if (errors.isEmpty() && !dataRows.isEmpty()) {
-            saveFileData(file, dataRows.size());
+            FileData savedFileData = saveFileData(file, dataRows.size());
+            // Capture errors from the save operation
+            List<String> saveErrors = datoIndicadorService.saveDatosIndicador(dataRows, savedFileData.getId());
+            errors.addAll(saveErrors);
         }
         return errors;
     }
 
- 
     protected abstract List<ValidatedDataRow> parseFile(MultipartFile file);
 
- 
-    private void saveFileData(MultipartFile file, int rowCount) {
+    private FileData saveFileData(MultipartFile file, int rowCount) { // Modificado para devolver la entidad guardada
         FileData fileData = new FileData();
         fileData.setFileName(file.getOriginalFilename());
         fileData.setFileType(getFileType());
         fileData.setProcessedDate(LocalDateTime.now());
         fileData.setData("Number of rows: " + rowCount);
-        fileDataRepository.save(fileData);
+        return fileDataRepository.save(fileData);
     }
 
    

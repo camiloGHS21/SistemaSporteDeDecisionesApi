@@ -21,13 +21,14 @@ import jakarta.validation.Validator;
 
 
 
+import com.example.demo.domain.core.DatoIndicadorService;
+
 @Service("excelFileProcessingService")
 public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingService {
 
-
     @Autowired
-    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService) {
-        super(fileDataRepository, validator, validationService);
+    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
+        super(fileDataRepository, validator, validationService, datoIndicadorService);
     }
 
 

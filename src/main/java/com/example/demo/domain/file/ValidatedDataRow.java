@@ -16,4 +16,10 @@ public class ValidatedDataRow {
 
     @Min(value = 0, message = "El valor debe ser positivo.")
     private float value;
+
+    private Integer anio;
+
+    private String fuente;
+
+    private String paisNombre;
 }

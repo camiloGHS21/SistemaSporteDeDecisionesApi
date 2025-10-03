@@ -18,12 +18,14 @@ import com.example.demo.application.file.AbstractFileProcessingService;
 
 
 
+import com.example.demo.domain.core.DatoIndicadorService;
+
 @Service("csvFileProcessingService")
 public class CsvFileProcessingServiceImpl extends AbstractFileProcessingService {
 
     @Autowired
-    public CsvFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService) {
-        super(fileDataRepository, validator, validationService);
+    public CsvFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
+        super(fileDataRepository, validator, validationService, datoIndicadorService);
     }
 
    
@@ -36,16 +38,19 @@ public class CsvFileProcessingServiceImpl extends AbstractFileProcessingService 
             // Omitir la fila de la cabecera
             reader.readNext();
             while ((nextLine = reader.readNext()) != null) {
-                if (nextLine.length >= 4) {
+                if (nextLine.length >= 5) { // Espera 5 columnas: pais, tipo_indicador, valor, anio, fuente
                     ValidatedDataRow row = new ValidatedDataRow();
-                    row.setName(nextLine[0]); // tipo_indicador
+                    row.setPaisNombre(nextLine[0]);
+                    row.setName(nextLine[1]);
                     try {
-                        row.setValue(Float.parseFloat(nextLine[1])); // valor
+                        row.setValue(Float.parseFloat(nextLine[2]));
+                        row.setAnio(Integer.parseInt(nextLine[3]));
                     } catch (NumberFormatException e) {
-                        // En una aplicación real, esto debería ser manejado por un sistema de logging.
-                        continue; // Omitir fila si el valor no es un número válido
+                        // Loggear el error y omitir la fila si los valores numéricos no son válidos
+                        System.err.println("Error parsing number in row: " + String.join(",", nextLine));
+                        continue;
                     }
-                    // Por simplicidad, no se parsean 'anio' y 'fuente' por ahora.
+                    row.setFuente(nextLine[4]);
                     dataRows.add(row);
                 }
             }
