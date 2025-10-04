@@ -14,4 +14,5 @@ public interface DatoIndicadorRepository extends JpaRepository<DatoIndicador, In
     @Query("SELECT d FROM DatoIndicador d WHERE UPPER(d.pais.nombre_pais) = UPPER(:nombrePais)")
     List<DatoIndicador> findByPais_NombrePaisIgnoreCase(@Param("nombrePais") String nombrePais);
 
+    boolean existsByPaisAndTipoIndicadorAndAnio(Pais pais, String tipoIndicador, Integer anio);
 }

@@ -20,7 +20,7 @@ public class DatoIndicador {
     @JoinColumn(name = "pais_id")
     private Pais pais;
 
-    private String tipo_indicador;
+    private String tipoIndicador;
 
     private float valor;
 
