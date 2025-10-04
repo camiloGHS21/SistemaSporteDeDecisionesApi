@@ -7,4 +7,6 @@ public interface DatoIndicadorService {
     List<String> saveDatosIndicador(List<ValidatedDataRow> dataRows, Long fileId);
 
     List<DatoIndicador> findByPaisNombre(String nombrePais);
+
+    List<String> findDistinctIndicadores();
 }

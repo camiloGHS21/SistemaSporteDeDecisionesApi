@@ -64,4 +64,9 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
     public List<DatoIndicador> findByPaisNombre(String nombrePais) {
         return datoIndicadorRepository.findByPais_NombrePaisIgnoreCase(nombrePais);
     }
+
+    @Override
+    public List<String> findDistinctIndicadores() {
+        return datoIndicadorRepository.findDistinctTipoIndicador();
+    }
 }

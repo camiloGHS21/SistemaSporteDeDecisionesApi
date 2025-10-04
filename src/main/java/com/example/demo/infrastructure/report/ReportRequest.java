@@ -10,7 +10,11 @@ public class ReportRequest {
 
     private String reportName;
 
-    private List<Long> fileIds;
+    private String paisPrincipal;
+
+    private List<String> paises;
+
+    private List<String> indicadores;
     
     private String reportType;
 }
