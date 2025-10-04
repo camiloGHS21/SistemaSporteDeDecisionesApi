@@ -24,6 +24,16 @@ public class IndicadorController {
         this.datoIndicadorService = datoIndicadorService;
     }
 
+    @GetMapping("/nombres")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<List<String>> getDistinctIndicadores() {
+        List<String> indicadores = datoIndicadorService.findDistinctIndicadores();
+        if (indicadores.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(indicadores);
+    }
+
     @GetMapping("/pais/{nombrePais}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<List<DatoIndicador>> getIndicadoresPorPais(@PathVariable String nombrePais) {
