@@ -29,23 +29,30 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
         List<String> errors = new ArrayList<>();
         List<DatoIndicador> indicadores = new ArrayList<>();
         for (ValidatedDataRow row : dataRows) {
-            // Trim whitespace from the country name for more flexible matching
             Optional<Pais> paisOpt = paisRepository.findByNombrePais(row.getPaisNombre().trim());
             if (paisOpt.isPresent()) {
-                DatoIndicador indicador = new DatoIndicador();
-                indicador.setPais(paisOpt.get());
-                indicador.setTipo_indicador(row.getName());
-                indicador.setValor(row.getValue());
-                indicador.setAnio(row.getAnio());
-                indicador.setFuente(row.getFuente());
-                indicadores.add(indicador);
+                Pais pais = paisOpt.get();
+                // Check for duplicates before adding
+                boolean isDuplicate = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnio(
+                        pais, row.getName(), row.getAnio());
+
+                if (isDuplicate) {
+                    errors.add("Dato duplicado para País: '" + row.getPaisNombre() +
+                            "', Indicador: '" + row.getName() + "', Año: " + row.getAnio());
+                } else {
+                    DatoIndicador indicador = new DatoIndicador();
+                    indicador.setPais(pais);
+                    indicador.setTipoIndicador(row.getName());
+                    indicador.setValor(row.getValue());
+                    indicador.setAnio(row.getAnio());
+                    indicador.setFuente(row.getFuente());
+                    indicadores.add(indicador);
+                }
             } else {
-                // Add error to the list instead of printing to console
                 errors.add("Fila ignorada: País no encontrado en la base de datos: '" + row.getPaisNombre() + "'");
             }
         }
 
-        // Only save if there are valid indicators to insert
         if (!indicadores.isEmpty()) {
             datoIndicadorRepository.saveAll(indicadores);
         }

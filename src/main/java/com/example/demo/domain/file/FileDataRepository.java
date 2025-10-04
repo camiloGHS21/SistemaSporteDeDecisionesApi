@@ -86,4 +86,8 @@ public interface FileDataRepository extends JpaRepository<FileData, Long> {
 
     @Override
     <S extends FileData> S saveAndFlush(S entity);
+
+    boolean existsByFileName(String fileName);
+
+    boolean existsByFileHash(String fileHash);
 }
