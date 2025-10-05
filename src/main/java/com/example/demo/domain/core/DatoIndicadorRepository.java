@@ -16,7 +16,7 @@ public interface DatoIndicadorRepository extends JpaRepository<DatoIndicador, In
     @Query("SELECT d FROM DatoIndicador d WHERE d.user = :user AND UPPER(d.pais.nombre_pais) = UPPER(:nombrePais)")
     List<DatoIndicador> findByUserAndPais_Nombre_paisIgnoreCase(@Param("user") User user, @Param("nombrePais") String nombrePais);
 
-    boolean existsByPaisAndTipoIndicadorAndAnio(Pais pais, String tipoIndicador, Integer anio);
+    boolean existsByPaisAndTipoIndicadorAndAnioAndUser(Pais pais, String tipoIndicador, Integer anio, User user);
 
     @Query("SELECT DISTINCT d.tipoIndicador FROM DatoIndicador d where d.user = :user ORDER BY d.tipoIndicador")
     List<String> findDistinctTipoIndicadorByUser(@Param("user") User user);

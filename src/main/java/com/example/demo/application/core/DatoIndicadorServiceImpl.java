@@ -34,7 +34,7 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
             if (paisOpt.isPresent()) {
                 Pais pais = paisOpt.get();
                 // Check for duplicates before adding
-                boolean isDuplicate = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnio(pais, row.getName(), row.getAnio());
+                boolean isDuplicate = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnioAndUser(pais, row.getName(), row.getAnio(), user);
 
                 if (isDuplicate) {
                     errors.add("Dato duplicado para País: '" + row.getPaisNombre() +

@@ -10,16 +10,16 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "file_data", indexes = {
-        @Index(name = "idx_filename", columnList = "fileName", unique = true),
-        @Index(name = "idx_filehash", columnList = "fileHash")
-})
+@Table(name = "file_data", 
+       indexes = { @Index(name = "idx_filehash", columnList = "fileHash") },
+       uniqueConstraints = { @UniqueConstraint(columnNames = {"fileName", "usuario_id"}) })
 public class FileData {
 
     @Id

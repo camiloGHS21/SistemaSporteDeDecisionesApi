@@ -46,16 +46,16 @@ public abstract class AbstractFileProcessingService implements FileProcessingSer
             String userEmail = authentication.getName();
             User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Step 1: Check for duplicates by filename
-            if (fileDataRepository.existsByFileName(file.getOriginalFilename())) {
-                throw new FileAlreadyExistsException("File with name '" + file.getOriginalFilename() + "' already exists.");
+            // Step 1: Check for duplicates by filename for the same user
+            if (fileDataRepository.existsByFileNameAndUser(file.getOriginalFilename(), user)) {
+                throw new FileAlreadyExistsException("File with name '" + file.getOriginalFilename() + "' already exists for this user.");
             }
 
-            // Step 2: Check for duplicates by content hash
+            // Step 2: Check for duplicates by content hash for the same user
             byte[] fileBytes = file.getBytes();
             String fileHash = calculateSha256(fileBytes);
-            if (fileDataRepository.existsByFileHash(fileHash)) {
-                throw new DuplicateFileContentException("File with identical content already exists.");
+            if (fileDataRepository.existsByFileHashAndUser(fileHash, user)) {
+                throw new DuplicateFileContentException("File with identical content already exists for this user.");
             }
 
             // Proceed with parsing and validation if no duplicates are found
