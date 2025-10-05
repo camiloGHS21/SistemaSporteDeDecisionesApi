@@ -1,5 +1,6 @@
 package com.example.demo.domain.core;
 
+import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,10 +12,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Pais {
 
@@ -37,4 +40,17 @@ public class Pais {
     @JsonIgnore
     @OneToMany(mappedBy = "pais_principal")
     private Set<Informe> informes_principal;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pais pais = (Pais) o;
+        return Objects.equals(pais_id, pais.pais_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pais_id);
+    }
 }

@@ -3,9 +3,12 @@ package com.example.demo.application.report;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,12 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.core.DatoIndicador;
 import com.example.demo.domain.core.DatoIndicadorRepository;
+import com.example.demo.domain.core.Pais;
+import com.example.demo.domain.core.PaisRepository;
+import com.example.demo.domain.report.Informe;
+import com.example.demo.domain.report.InformePaisComparacion;
+import com.example.demo.domain.report.InformePaisComparacionRepository;
+import com.example.demo.domain.report.InformeRepository;
 import com.example.demo.domain.user.User;
 import com.example.demo.infrastructure.report.ReportRequest;
 import com.itextpdf.kernel.colors.ColorConstants;
@@ -24,26 +33,66 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.opencsv.CSVWriter;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ReportServiceImpl implements ReportService {
 
     private final DatoIndicadorRepository datoIndicadorRepository;
+    private final InformeRepository informeRepository;
+    private final PaisRepository paisRepository;
+    private final InformePaisComparacionRepository informePaisComparacionRepository;
 
     @Autowired
-    public ReportServiceImpl(DatoIndicadorRepository datoIndicadorRepository) {
+    public ReportServiceImpl(DatoIndicadorRepository datoIndicadorRepository, InformeRepository informeRepository, PaisRepository paisRepository, InformePaisComparacionRepository informePaisComparacionRepository) {
         this.datoIndicadorRepository = datoIndicadorRepository;
+        this.informeRepository = informeRepository;
+        this.paisRepository = paisRepository;
+        this.informePaisComparacionRepository = informePaisComparacionRepository;
     }
 
     @Override
+    @Transactional
     public byte[] generateReport(ReportRequest request, User user) {
+        Informe informe = new Informe();
+        informe.setNombre_informe(request.getReportName());
+        informe.setUsuario(user);
+        informe.setFecha_generacion(LocalDateTime.now());
+
+        List<String> allPaises = new ArrayList<>();
+        if (request.getPaises() != null) {
+            allPaises.addAll(request.getPaises());
+        }
+
+        if (request.getPaisPrincipal() != null && !request.getPaisPrincipal().isEmpty()) {
+            Pais paisPrincipal = paisRepository.findByNombrePais(request.getPaisPrincipal()).orElseThrow(() -> new RuntimeException("Pais principal no encontrado"));
+            informe.setPais_principal(paisPrincipal);
+            if (!allPaises.contains(request.getPaisPrincipal())) {
+                allPaises.add(request.getPaisPrincipal());
+            }
+        }
+
+        Informe savedInforme = informeRepository.save(informe);
+
+        Set<InformePaisComparacion> paisesComparacion = new HashSet<>();
+        if (request.getPaises() != null) {
+            for (String nombrePais : request.getPaises()) {
+                Pais pais = paisRepository.findByNombrePais(nombrePais).orElseThrow(() -> new RuntimeException("Pais de comparación no encontrado: " + nombrePais));
+                InformePaisComparacion ipc = new InformePaisComparacion();
+                ipc.setInforme(savedInforme);
+                ipc.setPais_comparacion(pais);
+                paisesComparacion.add(ipc);
+            }
+        }
+        informePaisComparacionRepository.saveAll(paisesComparacion);
+
         if (request.getPaisPrincipal() != null && !request.getPaisPrincipal().isEmpty()) {
             return generateGapAnalysisPdf(request, user);
         }
 
-        List<String> paises = request.getPaises() != null ? request.getPaises() : new ArrayList<>();
         List<String> indicadores = request.getIndicadores() != null ? request.getIndicadores() : new ArrayList<>();
         
-        List<String> upperCasePaises = paises.stream().map(String::toUpperCase).collect(Collectors.toList());
+        List<String> upperCasePaises = allPaises.stream().map(String::toUpperCase).collect(Collectors.toList());
         List<String> upperCaseIndicadores = indicadores.stream().map(String::toUpperCase).collect(Collectors.toList());
         List<DatoIndicador> datos = datoIndicadorRepository.findByUserAndPaisesAndIndicadores(user, upperCasePaises, upperCaseIndicadores);
 

@@ -1,6 +1,7 @@
 package com.example.demo.domain.report;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 import com.example.demo.domain.core.Pais;
@@ -13,9 +14,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Informe {
 
@@ -42,4 +45,17 @@ public class Informe {
 
     @OneToMany(mappedBy = "informe")
     private Set<InformePaisComparacion> paises_comparacion;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Informe informe = (Informe) o;
+        return Objects.equals(informe_id, informe.informe_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(informe_id);
+    }
 }
