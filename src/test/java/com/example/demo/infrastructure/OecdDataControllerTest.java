@@ -10,12 +10,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.application.auth.JwtTokenProvider;
+import com.example.demo.application.Auth.JwtTokenProvider;
 import com.example.demo.domain.user.Role;
 import com.example.demo.domain.user.RoleRepository;
 import com.example.demo.domain.user.User;
@@ -45,9 +46,12 @@ public class OecdDataControllerTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = new Role();
-        userRole.setNombre_rol("ROLE_USER");
-        roleRepository.save(userRole);
+        Role userRole = roleRepository.findByNombreRol("ROLE_USER")
+                .orElseGet(() -> {
+                    Role newUserRole = new Role();
+                    newUserRole.setNombre_rol("ROLE_USER");
+                    return roleRepository.save(newUserRole);
+                });
 
         User user = new User();
         user.setNombre_usuario("user");
@@ -60,6 +64,7 @@ public class OecdDataControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getOecdData_whenUserIsAuthenticated_shouldReturnOk() throws Exception {
         mockMvc.perform(get("/api/oecd-data/MEX/2020")
                 .header("Authorization", "Bearer " + userToken))

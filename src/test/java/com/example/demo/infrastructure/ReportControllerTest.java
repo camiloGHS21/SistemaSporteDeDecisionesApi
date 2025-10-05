@@ -1,11 +1,12 @@
 package com.example.demo.infrastructure;
 
-import com.example.demo.application.auth.JwtTokenProvider;
+import com.example.demo.application.Auth.JwtTokenProvider;
 import com.example.demo.application.report.ReportService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import com.example.demo.infrastructure.report.ReportController;
 import com.example.demo.infrastructure.report.ReportRequest;
 
 @WebMvcTest(ReportController.class)
+@AutoConfigureMockMvc
 class ReportControllerTest {
 
     @Autowired

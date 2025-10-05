@@ -1,6 +1,6 @@
 package com.example.demo.infrastructure;
 
-import com.example.demo.application.auth.JwtTokenProvider;
+import com.example.demo.application.Auth.JwtTokenProvider;
 import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.demo.infrastructure.auth.LoginRequest;
+import com.example.demo.infrastructure.Auth.LoginRequest;
 
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)

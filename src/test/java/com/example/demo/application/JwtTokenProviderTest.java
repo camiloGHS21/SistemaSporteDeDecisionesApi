@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.demo.application.auth.JwtTokenProvider;
+import com.example.demo.application.Auth.JwtTokenProvider;
 
 @ExtendWith(MockitoExtension.class)
 class JwtTokenProviderTest {

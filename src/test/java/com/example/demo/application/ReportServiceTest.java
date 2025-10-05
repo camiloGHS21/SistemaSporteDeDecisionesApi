@@ -1,5 +1,6 @@
 package com.example.demo.application;
 
+import com.example.demo.domain.core.DatoIndicadorRepository;
 import com.example.demo.domain.file.FileData;
 import com.example.demo.domain.file.FileDataRepository;
 import com.example.demo.infrastructure.report.ReportRequest;
@@ -25,6 +26,9 @@ class ReportServiceTest {
     @Mock
     private FileDataRepository fileDataRepository;
 
+    @Mock
+    private DatoIndicadorRepository datoIndicadorRepository;
+
     @InjectMocks
     private ReportServiceImpl reportService;
 
@@ -35,13 +39,6 @@ class ReportServiceTest {
         request.setReportName("Test Report");
         request.setReportType("PDF");
         request.setFileIds(Collections.singletonList(1L));
-
-        FileData fileData = new FileData();
-        fileData.setFileName("test.csv");
-        fileData.setFileType("CSV");
-        fileData.setData("col1,col2\nval1,val2");
-
-        when(fileDataRepository.findAllById(any())).thenReturn(Collections.singletonList(fileData));
 
         // When
         byte[] pdfBytes = reportService.generateReport(request);

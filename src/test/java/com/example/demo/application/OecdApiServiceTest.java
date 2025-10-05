@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 import com.example.demo.application.external.OecdApiService;
 import com.example.demo.application.external.OecdApiServiceImpl;
 
-class OecdApiServiceImplTest {
+class OecdApiServiceTest {
 
     private static MockWebServer mockWebServer;
     private OecdApiService oecdApiService;

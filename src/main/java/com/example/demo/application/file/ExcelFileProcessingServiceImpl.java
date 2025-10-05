@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -39,17 +40,29 @@ public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingServic
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
-                // Omitir la fila de la cabecera
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-                ValidatedDataRow dataRow = new ValidatedDataRow();
-                dataRow.setName(row.getCell(0).getStringCellValue());
-                dataRow.setValue((int) row.getCell(1).getNumericCellValue());
-                dataRows.add(dataRow);
+
+                if (row.getLastCellNum() >= 5) {
+                    ValidatedDataRow dataRow = new ValidatedDataRow();
+                    dataRow.setPaisNombre(row.getCell(0).getStringCellValue());
+                    dataRow.setName(row.getCell(1).getStringCellValue());
+                    try {
+                        dataRow.setValue((float) row.getCell(2).getNumericCellValue());
+                        dataRow.setAnio((int) row.getCell(3).getNumericCellValue());
+                    } catch (IllegalStateException e) {
+                        System.err.println("Error parsing number in row: " + row.getRowNum());
+                        continue;
+                    }
+                    Cell fuenteCell = row.getCell(4);
+                    if (fuenteCell != null) {
+                        dataRow.setFuente(fuenteCell.getStringCellValue());
+                    }
+                    dataRows.add(dataRow);
+                }
             }
         } catch (IOException e) {
-            // En una aplicación real, esto debería ser manejado por un sistema de logging.
             e.printStackTrace();
         }
         return dataRows;
