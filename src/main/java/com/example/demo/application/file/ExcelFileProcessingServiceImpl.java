@@ -15,11 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.application.validation.ValidationService;
 import com.example.demo.domain.file.FileDataRepository;
 import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.domain.user.UserRepository;
 import com.example.demo.application.file.AbstractFileProcessingService;
 
 import jakarta.validation.Validator;
-
-
 
 import com.example.demo.domain.core.DatoIndicadorService;
 
@@ -27,8 +26,8 @@ import com.example.demo.domain.core.DatoIndicadorService;
 public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingService {
 
     @Autowired
-    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
-        super(fileDataRepository, validator, validationService, datoIndicadorService);
+    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService, UserRepository userRepository) {
+        super(fileDataRepository, validator, validationService, datoIndicadorService, userRepository);
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.demo.application.chart;
 
 import com.example.demo.domain.file.FileDataRepository;
+import com.example.demo.domain.user.User;
 import com.example.demo.infrastructure.chart.ChartDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,6 @@ import java.util.Collections;
 @Service
 public class ChartDataServiceImpl implements ChartDataService {
 
-
     private final FileDataRepository fileDataRepository;
 
     @Autowired
@@ -19,9 +19,8 @@ public class ChartDataServiceImpl implements ChartDataService {
     }
 
     @Override
-    public ChartDataResponse getChartData() {
-
-        long fileCount = fileDataRepository.count();
+    public ChartDataResponse getChartData(User user) {
+        long fileCount = fileDataRepository.countByUser(user);
 
         ChartDataResponse response = new ChartDataResponse();
         response.setLabels(Collections.singletonList("Processed Files"));

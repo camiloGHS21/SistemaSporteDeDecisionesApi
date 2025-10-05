@@ -5,6 +5,7 @@ import com.example.demo.domain.file.FileAlreadyExistsException;
 import com.example.demo.domain.file.FileData;
 import com.example.demo.domain.file.FileDataRepository;
 import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.domain.user.UserRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.Set;
 import com.example.demo.application.validation.ValidationService;
 import com.example.demo.domain.core.DatoIndicadorService;
+import com.example.demo.domain.user.User;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 
 public abstract class AbstractFileProcessingService implements FileProcessingService {
 
@@ -25,17 +29,23 @@ public abstract class AbstractFileProcessingService implements FileProcessingSer
     private final Validator validator;
     private final ValidationService validationService;
     private final DatoIndicadorService datoIndicadorService;
+    private final UserRepository userRepository;
 
-    public AbstractFileProcessingService(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
+    public AbstractFileProcessingService(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService, UserRepository userRepository) {
         this.fileDataRepository = fileDataRepository;
         this.validator = validator;
         this.validationService = validationService;
         this.datoIndicadorService = datoIndicadorService;
+        this.userRepository = userRepository;
     }
 
     @Override
     public List<String> processFile(MultipartFile file) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+
             // Step 1: Check for duplicates by filename
             if (fileDataRepository.existsByFileName(file.getOriginalFilename())) {
                 throw new FileAlreadyExistsException("File with name '" + file.getOriginalFilename() + "' already exists.");
@@ -63,8 +73,8 @@ public abstract class AbstractFileProcessingService implements FileProcessingSer
             }
 
             if (errors.isEmpty() && !dataRows.isEmpty()) {
-                FileData savedFileData = saveFileData(file, dataRows.size(), fileHash);
-                List<String> saveErrors = datoIndicadorService.saveDatosIndicador(dataRows, savedFileData.getId());
+                FileData savedFileData = saveFileData(file, dataRows.size(), fileHash, user);
+                List<String> saveErrors = datoIndicadorService.saveDatosIndicador(dataRows, savedFileData.getId(), user);
                 errors.addAll(saveErrors);
             }
             return errors;
@@ -92,13 +102,14 @@ public abstract class AbstractFileProcessingService implements FileProcessingSer
 
     protected abstract List<ValidatedDataRow> parseFile(MultipartFile file);
 
-    private FileData saveFileData(MultipartFile file, int rowCount, String fileHash) {
+    private FileData saveFileData(MultipartFile file, int rowCount, String fileHash, User user) {
         FileData fileData = new FileData();
         fileData.setFileName(file.getOriginalFilename());
         fileData.setFileType(getFileType());
         fileData.setProcessedDate(LocalDateTime.now());
         fileData.setFileHash(fileHash);
         fileData.setData("Number of rows: " + rowCount);
+        fileData.setUser(user);
         return fileDataRepository.save(fileData);
     }
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.core.DatoIndicador;
 import com.example.demo.domain.core.DatoIndicadorRepository;
+import com.example.demo.domain.user.User;
 import com.example.demo.infrastructure.report.ReportRequest;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -34,9 +35,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public byte[] generateReport(ReportRequest request) {
+    public byte[] generateReport(ReportRequest request, User user) {
         if (request.getPaisPrincipal() != null && !request.getPaisPrincipal().isEmpty()) {
-            return generateGapAnalysisPdf(request);
+            return generateGapAnalysisPdf(request, user);
         }
 
         List<String> paises = request.getPaises() != null ? request.getPaises() : new ArrayList<>();
@@ -44,7 +45,7 @@ public class ReportServiceImpl implements ReportService {
         
         List<String> upperCasePaises = paises.stream().map(String::toUpperCase).collect(Collectors.toList());
         List<String> upperCaseIndicadores = indicadores.stream().map(String::toUpperCase).collect(Collectors.toList());
-        List<DatoIndicador> datos = datoIndicadorRepository.findByPaisesAndIndicadores(upperCasePaises, upperCaseIndicadores);
+        List<DatoIndicador> datos = datoIndicadorRepository.findByUserAndPaisesAndIndicadores(user, upperCasePaises, upperCaseIndicadores);
 
         if ("CSV".equalsIgnoreCase(request.getReportType())) {
             return generateCsv(datos);
@@ -110,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
         return baos.toByteArray();
     }
 
-    private byte[] generateGapAnalysisPdf(ReportRequest request) {
+    private byte[] generateGapAnalysisPdf(ReportRequest request, User user) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
         Document doc = new Document(pdfDoc);
@@ -129,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
 
         List<String> upperCaseCountries = allCountries.stream().map(String::toUpperCase).collect(Collectors.toList());
         List<String> upperCaseIndicadores = indicadores.stream().map(String::toUpperCase).collect(Collectors.toList());
-        List<DatoIndicador> datos = datoIndicadorRepository.findByPaisesAndIndicadores(upperCaseCountries, upperCaseIndicadores);
+        List<DatoIndicador> datos = datoIndicadorRepository.findByUserAndPaisesAndIndicadores(user, upperCaseCountries, upperCaseIndicadores);
         
         Map<String, List<DatoIndicador>> groupedByIndicator = datos.stream()
                 .collect(Collectors.groupingBy(d -> d.getTipoIndicador().toUpperCase()));

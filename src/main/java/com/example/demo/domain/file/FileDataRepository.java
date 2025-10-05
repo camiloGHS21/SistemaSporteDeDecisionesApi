@@ -1,6 +1,7 @@
 package com.example.demo.domain.file;
 
 import com.example.demo.domain.file.FileData;
+import com.example.demo.domain.user.User;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,8 @@ import java.util.function.Function;
 
 @Repository
 public interface FileDataRepository extends JpaRepository<FileData, Long> {
+
+    long countByUser(User user);
 
     @Override
     long count();
