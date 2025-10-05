@@ -15,11 +15,11 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
-
+target/
 
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+target/test-classes/com/example/demo/
 ### STS ###
 .apt_generated
 .classpath
@@ -46,3 +46,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/target
