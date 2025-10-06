@@ -1,6 +1,8 @@
 package com.example.demo.infrastructure;
 
 import com.example.demo.application.chart.ChartDataService;
+import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.UserRepository;
 import com.example.demo.application.Auth.JwtTokenProvider;
 
 import org.junit.jupiter.api.Test;
@@ -11,7 +13,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,10 +34,13 @@ class ChartDataControllerTest {
     private ChartDataService chartDataService;
 
     @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "testuser@example.com")
     void testGetChartData() throws Exception {
         // Given
         ChartDataResponse response = new ChartDataResponse();
@@ -43,7 +50,9 @@ class ChartDataControllerTest {
         dataset.setData(Collections.singletonList(123));
         response.setDatasets(Collections.singletonList(dataset));
 
-        when(chartDataService.getChartData()).thenReturn(response);
+        User mockUser = new User();
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(mockUser));
+        when(chartDataService.getChartData(any(User.class))).thenReturn(response);
 
         // When & Then
         mockMvc.perform(get("/api/chart-data"))

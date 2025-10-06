@@ -5,6 +5,8 @@ import com.example.demo.domain.core.DatoIndicadorService;
 import com.example.demo.domain.core.Pais;
 import com.example.demo.domain.core.PaisRepository;
 import com.example.demo.domain.file.FileDataRepository;
+import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.UserRepository;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -22,6 +24,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,20 +61,34 @@ public class ExcelFileProcessingServiceValidationTest {
     @Mock
     private DatoIndicadorService datoIndicadorService;
 
+    @Mock
+    private UserRepository userRepository;
+
     private Validator validator;
 
     private ExcelFileProcessingServiceImpl excelFileProcessingService;
     private ValidationService validationService;
+    private User user;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        validationService = new ValidationServiceImpl(datoIndicadorRepository, paisRepository);
-        excelFileProcessingService = new ExcelFileProcessingServiceImpl(fileDataRepository, validator, validationService, datoIndicadorService);
-        when(fileDataRepository.existsByFileName(any())).thenReturn(false);
-        when(fileDataRepository.existsByFileHash(any())).thenReturn(false);
-        when(datoIndicadorService.saveDatosIndicador(any(), any())).thenReturn(Collections.emptyList());
+        validationService = new ValidationServiceImpl(datoIndicadorRepository, paisRepository, userRepository);
+        excelFileProcessingService = new ExcelFileProcessingServiceImpl(fileDataRepository, validator, validationService, datoIndicadorService, userRepository);
+        user = new User();
+        user.setEmail("test@example.com");
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(user.getEmail());
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(fileDataRepository.existsByFileNameAndUser(any(), any(User.class))).thenReturn(false);
+        when(fileDataRepository.existsByFileHashAndUser(any(), any(User.class))).thenReturn(false);
+        when(datoIndicadorService.saveDatosIndicador(any(), any(), any(User.class))).thenReturn(Collections.emptyList());
     }
 
     private MockMultipartFile createExcelFile(Object[][] data) throws IOException {

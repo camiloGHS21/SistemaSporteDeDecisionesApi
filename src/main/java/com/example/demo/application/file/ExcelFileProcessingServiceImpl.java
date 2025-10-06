@@ -43,8 +43,11 @@ public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingServic
                     continue;
                 }
                 ValidatedDataRow dataRow = new ValidatedDataRow();
-                dataRow.setName(row.getCell(0).getStringCellValue());
-                dataRow.setValue((int) row.getCell(1).getNumericCellValue());
+                dataRow.setPaisNombre(row.getCell(0).getStringCellValue());
+                dataRow.setName(row.getCell(1).getStringCellValue());
+                dataRow.setValue((float) row.getCell(2).getNumericCellValue());
+                dataRow.setAnio((int) row.getCell(3).getNumericCellValue());
+                dataRow.setFuente(row.getCell(4).getStringCellValue());
                 dataRows.add(dataRow);
             }
         } catch (IOException e) {

@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import com.example.demo.domain.user.User;
 
 import com.example.demo.application.chart.ChartDataServiceImpl;
 
@@ -26,10 +27,11 @@ class ChartDataServiceTest {
     @Test
     void testGetChartData() {
         // Given
-        when(fileDataRepository.count()).thenReturn(5L);
+        User user = new User();
+        when(fileDataRepository.countByUser(user)).thenReturn(5L);
 
         // When
-        ChartDataResponse response = chartDataService.getChartData();
+        ChartDataResponse response = chartDataService.getChartData(user);
 
         // Then
         assertEquals(1, response.getLabels().size());

@@ -5,6 +5,8 @@ import com.example.demo.domain.core.DatoIndicadorService;
 import com.example.demo.domain.core.Pais;
 import com.example.demo.domain.core.PaisRepository;
 import com.example.demo.domain.file.FileDataRepository;
+import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.UserRepository;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -20,6 +22,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,17 +63,31 @@ class ExcelFileProcessingServiceTest {
     @Mock
     private DatoIndicadorService datoIndicadorService;
 
+    @Mock
+    private UserRepository userRepository;
+
     private Validator validator;
 
     private ExcelFileProcessingServiceImpl excelFileProcessingService;
     private ValidationService validationService;
+    private User user;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        validationService = new ValidationServiceImpl(datoIndicadorRepository, paisRepository);
-        excelFileProcessingService = new ExcelFileProcessingServiceImpl(fileDataRepository, validator, validationService, datoIndicadorService);
+        validationService = new ValidationServiceImpl(datoIndicadorRepository, paisRepository, userRepository);
+        excelFileProcessingService = new ExcelFileProcessingServiceImpl(fileDataRepository, validator, validationService, datoIndicadorService, userRepository);
+        user = new User();
+        user.setEmail("test@example.com");
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(user.getEmail());
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
     }
 
     @Test
@@ -74,10 +95,10 @@ class ExcelFileProcessingServiceTest {
         // Given
         byte[] excelContent = createExcelContent("Mexico", "IndicadorA", 123.45, 2023, "FuenteA");
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelContent);
-        when(fileDataRepository.existsByFileName(any())).thenReturn(false);
-        when(fileDataRepository.existsByFileHash(any())).thenReturn(false);
+        when(fileDataRepository.existsByFileNameAndUser(any(), any(User.class))).thenReturn(false);
+        when(fileDataRepository.existsByFileHashAndUser(any(), any(User.class))).thenReturn(false);
         when(paisRepository.findByNombrePais(any())).thenReturn(Optional.of(new Pais()));
-        when(datoIndicadorService.saveDatosIndicador(any(), any())).thenReturn(Collections.emptyList());
+        when(datoIndicadorService.saveDatosIndicador(any(), any(), any(User.class))).thenReturn(Collections.emptyList());
         when(fileDataRepository.save(any())).thenReturn(new FileData());
 
         // When
@@ -93,8 +114,8 @@ class ExcelFileProcessingServiceTest {
         // Given
         byte[] excelContent = createExcelContent("Mexico", "", 123.45, 2023, "FuenteA"); // Invalid name (empty)
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelContent);
-        when(fileDataRepository.existsByFileName(any())).thenReturn(false);
-        when(fileDataRepository.existsByFileHash(any())).thenReturn(false);
+        when(fileDataRepository.existsByFileNameAndUser(any(), any(User.class))).thenReturn(false);
+        when(fileDataRepository.existsByFileHashAndUser(any(), any(User.class))).thenReturn(false);
         when(paisRepository.findByNombrePais(any())).thenReturn(Optional.of(new Pais()));
 
         // When
@@ -133,7 +154,7 @@ class ExcelFileProcessingServiceTest {
         // Given
         byte[] excelContent = createExcelContent("Mexico", "IndicadorA", 123.45, 2023, "FuenteA");
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelContent);
-        when(fileDataRepository.existsByFileName(any())).thenReturn(true);
+        when(fileDataRepository.existsByFileNameAndUser(any(), any(User.class))).thenReturn(true);
 
         // When & Then
         assertThrows(FileAlreadyExistsException.class, () -> {
@@ -146,8 +167,8 @@ class ExcelFileProcessingServiceTest {
         // Given
         byte[] excelContent = createExcelContent("Mexico", "IndicadorA", 123.45, 2023, "FuenteA");
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelContent);
-        when(fileDataRepository.existsByFileName(any())).thenReturn(false);
-        when(fileDataRepository.existsByFileHash(any())).thenReturn(true);
+        when(fileDataRepository.existsByFileNameAndUser(any(), any(User.class))).thenReturn(false);
+        when(fileDataRepository.existsByFileHashAndUser(any(), any(User.class))).thenReturn(true);
 
         // When & Then
         assertThrows(DuplicateFileContentException.class, () -> {
