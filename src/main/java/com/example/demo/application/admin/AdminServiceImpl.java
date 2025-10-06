@@ -1,11 +1,13 @@
 package com.example.demo.application.admin;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.application.report.ReportService;
 import com.example.demo.domain.file.FileDataRepository;
 import com.example.demo.domain.report.Informe;
 import com.example.demo.domain.report.InformeRepository;
@@ -28,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final InformeRepository informeRepository;
+    private final ReportService reportService;
 
     @Override
     public DashboardStats getDashboardStats() {
@@ -47,8 +50,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public UserDTO getUserById(Integer id) {
-        return userRepository.findById(id.longValue())
+    public UserDTO getUserById(Long id) {
+        return userRepository.findById(id)
                 .map(this::toUserDTO)
                 .orElse(null);
     }
@@ -65,8 +68,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public UserDTO updateUser(Integer id, UserDTO userDTO) {
-        User user = userRepository.findById(id.longValue()).orElseThrow(() -> new RuntimeException("User not found"));
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setNombre_usuario(userDTO.getNombre_usuario());
         user.setEmail(userDTO.getEmail());
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
@@ -78,8 +81,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void deleteUser(Integer id) {
-        userRepository.deleteById(id.longValue());
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -91,19 +94,29 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ReportDTO getReportById(Long id) {
-        return informeRepository.findById(id.intValue())
+        return informeRepository.findById(id)
                 .map(this::toReportDTO)
                 .orElse(null);
     }
 
     @Override
     public void deleteReport(Long id) {
-        informeRepository.deleteById(id.intValue());
+        informeRepository.deleteById(id);
+    }
+
+    @Override
+    public byte[] getReportPdf(Long id) {
+        try {
+            return reportService.generateReportPdf(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
     }
 
     private ReportDTO toReportDTO(Informe informe) {
         ReportDTO reportDTO = new ReportDTO();
-        reportDTO.setId(informe.getInforme_id().longValue());
+        reportDTO.setId(informe.getId());
         reportDTO.setTitle(informe.getNombre_informe());
         reportDTO.setUser(informe.getUsuario().getNombre_usuario());
         reportDTO.setDate(informe.getFecha_generacion());

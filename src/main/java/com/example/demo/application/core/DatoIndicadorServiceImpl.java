@@ -42,7 +42,7 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
                 } else {
                     DatoIndicador indicador = new DatoIndicador();
                     indicador.setPais(pais);
-                    indicador.setTipoIndicador(row.getName());
+                    indicador.setTipoIndicador(row.getName().trim());
                     indicador.setValor(row.getValue());
                     indicador.setAnio(row.getAnio());
                     indicador.setFuente(row.getFuente());

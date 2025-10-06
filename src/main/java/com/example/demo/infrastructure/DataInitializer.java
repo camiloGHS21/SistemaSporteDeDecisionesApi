@@ -21,6 +21,12 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (roleRepository.findByNombreRol("ROLE_USER").isEmpty()) {
+            Role userRole = new Role();
+            userRole.setNombre_rol("ROLE_USER");
+            roleRepository.save(userRole);
+        }
+
         if (userRepository.findByEmail("admin@ghs21.online").isEmpty()) {
             Role adminRole = roleRepository.findByNombreRol("ROLE_ADMIN").orElseGet(() -> {
                 Role newRole = new Role();

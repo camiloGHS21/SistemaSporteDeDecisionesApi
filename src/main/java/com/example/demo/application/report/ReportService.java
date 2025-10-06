@@ -6,4 +6,6 @@ import com.example.demo.infrastructure.report.ReportRequest;
 public interface ReportService {
 
     byte[] generateReport(ReportRequest request, User user);
+
+    byte[] generateReportPdf(Long reportId) throws Exception;
 }

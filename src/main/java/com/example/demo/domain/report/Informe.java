@@ -1,12 +1,15 @@
 package com.example.demo.domain.report;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import com.example.demo.domain.core.Pais;
 import com.example.demo.domain.user.User;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +28,7 @@ public class Informe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer informe_id;
+    private Long id;
 
 
     @ManyToOne
@@ -43,19 +46,22 @@ public class Informe {
     private Pais pais_principal;
 
 
-    @OneToMany(mappedBy = "informe")
+    @OneToMany(mappedBy = "informe", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<InformePaisComparacion> paises_comparacion;
+
+    @ElementCollection
+    private List<String> indicadores;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Informe informe = (Informe) o;
-        return Objects.equals(informe_id, informe.informe_id);
+        return Objects.equals(id, informe.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(informe_id);
+        return Objects.hash(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.application.admin;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import com.example.demo.infrastructure.admin.DashboardStats;
@@ -12,17 +13,19 @@ public interface AdminService {
 
     List<UserDTO> getUsers();
 
-    UserDTO getUserById(Integer id);
+    UserDTO getUserById(Long id);
 
     UserDTO createUser(UserDTO userDTO);
 
-    UserDTO updateUser(Integer id, UserDTO userDTO);
+    UserDTO updateUser(Long id, UserDTO userDTO);
 
-    void deleteUser(Integer id);
+    void deleteUser(Long id);
 
     List<ReportDTO> getReports();
 
     ReportDTO getReportById(Long id);
 
     void deleteReport(Long id);
+
+    byte[] getReportPdf(Long id);
 }
