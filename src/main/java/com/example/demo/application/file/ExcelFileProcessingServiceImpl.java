@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,11 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.application.validation.ValidationService;
 import com.example.demo.domain.file.FileDataRepository;
 import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.domain.user.UserRepository;
 import com.example.demo.application.file.AbstractFileProcessingService;
 
 import jakarta.validation.Validator;
-
-
 
 import com.example.demo.domain.core.DatoIndicadorService;
 
@@ -28,8 +26,8 @@ import com.example.demo.domain.core.DatoIndicadorService;
 public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingService {
 
     @Autowired
-    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
-        super(fileDataRepository, validator, validationService, datoIndicadorService);
+    public ExcelFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService, UserRepository userRepository) {
+        super(fileDataRepository, validator, validationService, datoIndicadorService, userRepository);
     }
 
 
@@ -40,29 +38,17 @@ public class ExcelFileProcessingServiceImpl extends AbstractFileProcessingServic
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
+                // Omitir la fila de la cabecera
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-
-                if (row.getLastCellNum() >= 5) {
-                    ValidatedDataRow dataRow = new ValidatedDataRow();
-                    dataRow.setPaisNombre(row.getCell(0).getStringCellValue());
-                    dataRow.setName(row.getCell(1).getStringCellValue());
-                    try {
-                        dataRow.setValue((float) row.getCell(2).getNumericCellValue());
-                        dataRow.setAnio((int) row.getCell(3).getNumericCellValue());
-                    } catch (IllegalStateException e) {
-                        System.err.println("Error parsing number in row: " + row.getRowNum());
-                        continue;
-                    }
-                    Cell fuenteCell = row.getCell(4);
-                    if (fuenteCell != null) {
-                        dataRow.setFuente(fuenteCell.getStringCellValue());
-                    }
-                    dataRows.add(dataRow);
-                }
+                ValidatedDataRow dataRow = new ValidatedDataRow();
+                dataRow.setName(row.getCell(0).getStringCellValue());
+                dataRow.setValue((int) row.getCell(1).getNumericCellValue());
+                dataRows.add(dataRow);
             }
         } catch (IOException e) {
+            // En una aplicación real, esto debería ser manejado por un sistema de logging.
             e.printStackTrace();
         }
         return dataRows;

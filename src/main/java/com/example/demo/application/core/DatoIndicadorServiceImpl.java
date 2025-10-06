@@ -12,6 +12,7 @@ import com.example.demo.domain.core.DatoIndicadorService;
 import com.example.demo.domain.core.Pais;
 import com.example.demo.domain.core.PaisRepository;
 import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.domain.user.User;
 
 @Service
 public class DatoIndicadorServiceImpl implements DatoIndicadorService {
@@ -25,7 +26,7 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
     }
 
     @Override
-    public List<String> saveDatosIndicador(List<ValidatedDataRow> dataRows, Long fileId) {
+    public List<String> saveDatosIndicador(List<ValidatedDataRow> dataRows, Long fileId, User user) {
         List<String> errors = new ArrayList<>();
         List<DatoIndicador> indicadores = new ArrayList<>();
         for (ValidatedDataRow row : dataRows) {
@@ -33,8 +34,7 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
             if (paisOpt.isPresent()) {
                 Pais pais = paisOpt.get();
                 // Check for duplicates before adding
-                boolean isDuplicate = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnio(
-                        pais, row.getName(), row.getAnio());
+                boolean isDuplicate = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnioAndUser(pais, row.getName(), row.getAnio(), user);
 
                 if (isDuplicate) {
                     errors.add("Dato duplicado para País: '" + row.getPaisNombre() +
@@ -42,10 +42,11 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
                 } else {
                     DatoIndicador indicador = new DatoIndicador();
                     indicador.setPais(pais);
-                    indicador.setTipoIndicador(row.getName());
+                    indicador.setTipoIndicador(row.getName().trim());
                     indicador.setValor(row.getValue());
                     indicador.setAnio(row.getAnio());
                     indicador.setFuente(row.getFuente());
+                    indicador.setUser(user);
                     indicadores.add(indicador);
                 }
             } else {
@@ -61,12 +62,12 @@ public class DatoIndicadorServiceImpl implements DatoIndicadorService {
     }
 
     @Override
-    public List<DatoIndicador> findByPaisNombre(String nombrePais) {
-        return datoIndicadorRepository.findByPais_NombrePaisIgnoreCase(nombrePais);
+    public List<DatoIndicador> findByUserAndPais_Nombre_paisIgnoreCase(User user, String nombrePais) {
+        return datoIndicadorRepository.findByUserAndPais_Nombre_paisIgnoreCase(user, nombrePais);
     }
 
     @Override
-    public List<String> findDistinctIndicadores() {
-        return datoIndicadorRepository.findDistinctTipoIndicador();
+    public List<String> findDistinctIndicadoresByUser(User user) {
+        return datoIndicadorRepository.findDistinctTipoIndicadorByUser(user);
     }
 }

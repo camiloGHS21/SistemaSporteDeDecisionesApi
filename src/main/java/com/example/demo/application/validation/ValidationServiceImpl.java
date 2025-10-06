@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.core.DatoIndicadorRepository;
 import com.example.demo.domain.core.Pais;
 import com.example.demo.domain.core.PaisRepository;
 import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +25,7 @@ public class ValidationServiceImpl implements ValidationService {
 
     private final DatoIndicadorRepository datoIndicadorRepository;
     private final PaisRepository paisRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<String> validateUniqueNames(List<ValidatedDataRow> rows) {
@@ -28,6 +33,11 @@ public class ValidationServiceImpl implements ValidationService {
         if (rows == null) {
             return errors;
         }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+
         Set<String> uniqueInFile = new HashSet<>();
         for (ValidatedDataRow row : rows) {
             String uniqueKey = row.getPaisNombre() + "-" + row.getName() + "-" + row.getAnio();
@@ -43,7 +53,7 @@ public class ValidationServiceImpl implements ValidationService {
             }
 
             Pais pais = paisOpt.get();
-            boolean exists = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnio(pais, row.getName(), row.getAnio());
+            boolean exists = datoIndicadorRepository.existsByPaisAndTipoIndicadorAndAnioAndUser(pais, row.getName(), row.getAnio(), user);
             if (exists) {
                 errors.add("El dato para el país '" + row.getPaisNombre() + "', indicador '" + row.getName() + "' y año '" + row.getAnio() + "' ya existe en la base de datos.");
             }

@@ -2,6 +2,7 @@ package com.example.demo.application.file;
 
 import com.example.demo.domain.file.FileDataRepository;
 import com.example.demo.domain.file.ValidatedDataRow;
+import com.example.demo.domain.user.UserRepository;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import jakarta.validation.Validator;
@@ -16,16 +17,14 @@ import java.util.List;
 import com.example.demo.application.validation.ValidationService;
 import com.example.demo.application.file.AbstractFileProcessingService;
 
-
-
 import com.example.demo.domain.core.DatoIndicadorService;
 
 @Service("csvFileProcessingService")
 public class CsvFileProcessingServiceImpl extends AbstractFileProcessingService {
 
     @Autowired
-    public CsvFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService) {
-        super(fileDataRepository, validator, validationService, datoIndicadorService);
+    public CsvFileProcessingServiceImpl(FileDataRepository fileDataRepository, Validator validator, ValidationService validationService, DatoIndicadorService datoIndicadorService, UserRepository userRepository) {
+        super(fileDataRepository, validator, validationService, datoIndicadorService, userRepository);
     }
 
    

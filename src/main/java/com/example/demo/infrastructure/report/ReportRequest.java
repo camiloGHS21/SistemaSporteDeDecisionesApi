@@ -15,8 +15,6 @@ public class ReportRequest {
     private List<String> paises;
 
     private List<String> indicadores;
-
-    private List<Long> fileIds;
     
     private String reportType;
 }
