@@ -62,6 +62,7 @@ C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src
 C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\file\FileUploadController.java
 C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\GlobalExceptionHandler.java
 C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\indicador\IndicadorController.java
+C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\OpenApiConfig.java
 C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\pais\PaisController.java
 C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\report\ReportController.java
 C:\Users\Administrator\Documents\GitHub\backend\SistemaSporteDeDecisionesApi\src\main\java\com\example\demo\infrastructure\report\ReportRequest.java

@@ -10,7 +10,9 @@ com\example\demo\domain\file\FileAlreadyExistsException.class
 com\example\demo\domain\user\UserRepository.class
 com\example\demo\domain\external\ExternalDataService.class
 com\example\demo\infrastructure\ValidationErrorResponse.class
+com\example\demo\infrastructure\admin\AdminController.class
 com\example\demo\application\external\ExternalApiServiceImpl.class
+com\example\demo\application\admin\AdminServiceImpl.class
 com\example\demo\application\file\FileDataServiceImpl.class
 com\example\demo\domain\user\UserService.class
 com\example\demo\domain\file\FileDataService.class
@@ -22,13 +24,16 @@ com\example\demo\domain\core\DatoIndicadorService.class
 com\example\demo\application\file\AbstractFileProcessingService.class
 com\example\demo\domain\core\DatoIndicadorRepository.class
 com\example\demo\application\chart\ChartDataServiceImpl.class
+com\example\demo\infrastructure\admin\UserDTO.class
 com\example\demo\infrastructure\external\OecdDataController.class
 com\example\demo\infrastructure\Auth\LoginResponse.class
 com\example\demo\domain\user\Role.class
 com\example\demo\domain\user\User.class
 com\example\demo\infrastructure\CorsConfig.class
+com\example\demo\infrastructure\admin\DashboardStats.class
 com\example\demo\infrastructure\Auth\JwtAuthenticationFilter.class
 com\example\demo\infrastructure\chart\ChartDataController.class
+com\example\demo\infrastructure\OpenApiConfig.class
 com\example\demo\domain\external\ExternalDataRepository.class
 com\example\demo\DemoApplication.class
 com\example\demo\domain\core\Pais.class
@@ -42,6 +47,8 @@ com\example\demo\domain\external\OecdData.class
 com\example\demo\domain\report\InformePaisComparacionRepository.class
 com\example\demo\infrastructure\GlobalExceptionHandler.class
 com\example\demo\infrastructure\chart\ChartDataResponse.class
+com\example\demo\application\admin\AdminService.class
+com\example\demo\infrastructure\admin\ReportDTO.class
 com\example\demo\infrastructure\SecurityConfig.class
 com\example\demo\domain\external\ExternalData.class
 com\example\demo\infrastructure\report\ReportController.class
@@ -55,6 +62,7 @@ com\example\demo\domain\file\ValidatedDataRow.class
 com\example\demo\application\report\ReportServiceImpl.class
 com\example\demo\application\external\ExternalApiService.class
 com\example\demo\domain\report\Informe.class
+com\example\demo\infrastructure\DataInitializer.class
 com\example\demo\application\file\ExcelFileProcessingServiceImpl.class
 com\example\demo\domain\file\FileDataRepository.class
 com\example\demo\domain\user\RoleRepository.class

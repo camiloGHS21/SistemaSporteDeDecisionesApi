@@ -38,7 +38,7 @@ class PaisControllerTest {
         when(paisService.findAll()).thenReturn(Collections.singletonList(pais));
 
         // When & Then
-        mockMvc.perform(get("/api/paises"))
+        mockMvc.perform(get("/api/paises/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nombre_pais").value("Mexico"));
     }
@@ -50,7 +50,7 @@ class PaisControllerTest {
         when(paisService.findAll()).thenReturn(Collections.emptyList());
 
         // When & Then
-        mockMvc.perform(get("/api/paises"))
+        mockMvc.perform(get("/api/paises/"))
                 .andExpect(status().isNoContent());
     }
 }
