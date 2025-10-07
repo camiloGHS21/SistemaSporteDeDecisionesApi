@@ -17,6 +17,9 @@ import com.example.demo.domain.core.DatoIndicadorService;
 import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/api/indicadores")
 public class IndicadorController {
@@ -30,6 +33,14 @@ public class IndicadorController {
         this.userRepository = userRepository;
     }
 
+    @Operation(
+        summary = "Obtener nombres de indicadores distintos",
+        description = "Devuelve una lista de los nombres de todos los indicadores únicos asociados al usuario autenticado.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de nombres de indicadores obtenida"),
+            @ApiResponse(responseCode = "204", description = "No hay indicadores para el usuario")
+        }
+    )
     @GetMapping("/nombres")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<List<String>> getDistinctIndicadores() {
@@ -43,6 +54,14 @@ public class IndicadorController {
         return ResponseEntity.ok(indicadores);
     }
 
+    @Operation(
+        summary = "Obtener indicadores por país",
+        description = "Devuelve una lista de todos los datos de indicadores para un país específico, asociados al usuario autenticado.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de datos de indicadores obtenida"),
+            @ApiResponse(responseCode = "204", description = "No hay datos para el país y usuario especificados")
+        }
+    )
     @GetMapping("/pais/{nombrePais}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<List<DatoIndicador>> getIndicadoresPorPais(@PathVariable String nombrePais) {

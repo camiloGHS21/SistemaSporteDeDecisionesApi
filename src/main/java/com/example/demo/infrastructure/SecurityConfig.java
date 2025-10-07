@@ -1,13 +1,12 @@
 package com.example.demo.infrastructure;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,7 +39,9 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/users/register", "/api/auth/login","/api/auth/validate","/actuator/**","/api/oecd-data/**", "/api/upload/**","/api/chart-data/**","/api/reports/**","/api/indicadores/pais/**","/api/indicadores/nombres/**","/api/paises/**","/api/files/**","/api/admin/**","/api/admin/auth/validate/**").permitAll()
+                .requestMatchers("/api/users/register", "/api/auth/login","/api/auth/validate","/actuator/**","/api/oecd-data/**", "/api/upload/**","/api/chart-data/**","/api/reports/**","/api/indicadores/pais/**","/api/indicadores/nombres/**","/api/paises/**","/api/files/**","/api/admin/**","/api/admin/auth/validate/**", "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

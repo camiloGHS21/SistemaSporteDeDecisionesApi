@@ -15,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.application.file.FileProcessingService;
 import com.example.demo.infrastructure.ValidationErrorResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 
 @RestController
 @RequestMapping("/api")
@@ -34,6 +37,14 @@ public class FileUploadController {
 
    
 
+    @Operation(
+        summary = "Subir un archivo de datos (CSV o Excel)",
+        description = "Procesa un archivo CSV o Excel para extraer y validar datos de indicadores. Devuelve errores de validación si los hay.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Archivo subido y procesándose"),
+            @ApiResponse(responseCode = "400", description = "Archivo no soportado, vacío o con errores de validación")
+        }
+    )
     @PostMapping("/upload")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
