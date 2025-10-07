@@ -32,7 +32,7 @@ public class PaisController {
             @ApiResponse(responseCode = "204", description = "No hay países para mostrar")
         }
     )
-    @GetMapping("/")
+    @GetMapping()
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<List<Pais>> getAllPaises() {
         List<Pais> paises = paisService.findAll();
