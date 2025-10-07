@@ -20,6 +20,9 @@ import com.example.demo.domain.user.UserService;
 import com.example.demo.infrastructure.Auth.LoginRequest;
 import com.example.demo.infrastructure.Auth.LoginResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -34,6 +37,14 @@ public class UserController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @Operation(
+        summary = "Registrar un nuevo usuario",
+        description = "Crea una nueva cuenta de usuario en el sistema.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Usuario registrado con éxito"),
+            @ApiResponse(responseCode = "409", description = "El usuario ya existe")
+        }
+    )
     @PostMapping("/users/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         try {
@@ -44,6 +55,14 @@ public class UserController {
         }
     }
 
+    @Operation(
+        summary = "Iniciar sesión de usuario",
+        description = "Autentica a un usuario y devuelve un token JWT si las credenciales son correctas.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Inicio de sesión exitoso, devuelve token JWT"),
+            @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
+        }
+    )
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -54,6 +73,14 @@ public class UserController {
         return ResponseEntity.ok(new LoginResponse(jwt));
     }
 
+    @Operation(
+        summary = "Validar un token JWT",
+        description = "Verifica si un token JWT proporcionado en la cabecera de autorización es válido.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "El token es válido"),
+            @ApiResponse(responseCode = "401", description = "El token es inválido o ha expirado")
+        }
+    )
     @PostMapping("/auth/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
         String jwt = token.substring(7); // Remove "Bearer " prefix

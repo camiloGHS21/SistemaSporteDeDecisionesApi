@@ -13,6 +13,9 @@ import com.example.demo.application.chart.ChartDataService;
 import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/api")
 public class ChartDataController {
@@ -26,6 +29,14 @@ public class ChartDataController {
         this.userRepository = userRepository;
     }
   
+    @Operation(
+        summary = "Obtener datos para gráficos",
+        description = "Devuelve datos agregados y formateados para ser consumidos por gráficos en el frontend, basados en la información del usuario autenticado.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Datos para gráficos obtenidos con éxito"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+        }
+    )
     @GetMapping("/chart-data")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<ChartDataResponse> getChartData() {

@@ -21,6 +21,8 @@ import com.example.demo.application.report.ReportService;
 import com.example.demo.domain.report.Informe;
 import com.example.demo.domain.report.InformeRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,56 +35,67 @@ public class AdminController {
     private final ReportService reportService;
     private final InformeRepository informeRepository;
 
+    @Operation(summary = "Validar acceso de administrador", description = "Verifica si el usuario actual tiene rol de administrador.")
     @GetMapping("/auth/validate")
     public ResponseEntity<Boolean> validateAdmin() {
         return ResponseEntity.ok(true);
     }
 
+    @Operation(summary = "Obtener estadísticas del dashboard", description = "Devuelve estadísticas agregadas para el panel de administración.")
     @GetMapping("/dashboard-stats")
     public DashboardStats getDashboardStats() {
         return adminService.getDashboardStats();
     }
 
+    @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista de todos los usuarios del sistema.")
     @GetMapping("/users")
     public List<UserDTO> getUsers() {
         return adminService.getUsers();
     }
 
+    @Operation(summary = "Obtener un usuario por ID", description = "Devuelve los detalles de un usuario específico.")
     @GetMapping("/users/{id}")
     public UserDTO getUserById(@PathVariable Long id) {
         return adminService.getUserById(id);
     }
 
+    @Operation(summary = "Crear un nuevo usuario", description = "Crea un nuevo usuario en el sistema.")
     @PostMapping("/users")
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         return adminService.createUser(userDTO);
     }
 
+    @Operation(summary = "Actualizar un usuario", description = "Actualiza los datos de un usuario existente.")
     @PutMapping("/users/{id}")
     public UserDTO updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         return adminService.updateUser(id, userDTO);
     }
 
+    @Operation(summary = "Eliminar un usuario", description = "Elimina un usuario del sistema.")
     @DeleteMapping("/users/{id}")
     public void deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
     }
 
+    @Operation(summary = "Obtener todos los informes", description = "Devuelve una lista de todos los informes generados.")
     @GetMapping("/reports")
     public List<ReportDTO> getReports() {
         return adminService.getReports();
     }
 
+    @Operation(summary = "Obtener un informe por ID", description = "Devuelve los detalles de un informe específico.")
     @GetMapping("/reports/{id}")
     public ReportDTO getReportById(@PathVariable Long id) {
         return adminService.getReportById(id);
     }
 
+    @Operation(summary = "Eliminar un informe", description = "Elimina un informe del sistema.")
     @DeleteMapping("/reports/{id}")
     public void deleteReport(@PathVariable Long id) {
         adminService.deleteReport(id);
     }
 
+    @Operation(summary = "Descargar un informe en PDF", description = "Genera y descarga un informe específico en formato PDF.")
     @GetMapping("/reports/{id}/download")
     public ResponseEntity<byte[]> downloadReport(@PathVariable Long id) {
         try {

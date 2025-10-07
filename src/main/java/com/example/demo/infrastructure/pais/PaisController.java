@@ -2,6 +2,10 @@ package com.example.demo.infrastructure.pais;
 
 import com.example.demo.domain.core.Pais;
 import com.example.demo.domain.core.PaisService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +24,15 @@ public class PaisController {
         this.paisService = paisService;
     }
 
-    @GetMapping
+    @Operation(
+        summary = "Obtener todos los países",
+        description = "Devuelve una lista de todos los países disponibles en el sistema.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de países obtenida con éxito"),
+            @ApiResponse(responseCode = "204", description = "No hay países para mostrar")
+        }
+    )
+    @GetMapping("/")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<List<Pais>> getAllPaises() {
         List<Pais> paises = paisService.findAll();

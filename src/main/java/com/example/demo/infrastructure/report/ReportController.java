@@ -16,6 +16,10 @@ import com.example.demo.application.report.ReportService;
 import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.UserRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/api")
 public class ReportController {
@@ -29,6 +33,15 @@ public class ReportController {
         this.userRepository = userRepository;
     }
 
+    @Operation(
+        summary = "Generar un nuevo informe",
+        description = "Crea y devuelve un informe en formato PDF o CSV basado en los criterios de la solicitud.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Informe generado con éxito", content = @Content(mediaType = "application/pdf")),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "500", description = "Error interno al generar el informe")
+        }
+    )
     @PostMapping("/reports")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<byte[]> generateReport(@RequestBody ReportRequest request) {

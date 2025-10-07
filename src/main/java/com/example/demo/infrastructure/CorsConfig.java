@@ -10,9 +10,9 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*") // Permite cualquier origen
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Permite los métodos HTTP comunes
-                .allowedHeaders("*") // Permite cualquier encabezado
-                .allowCredentials(false); // No permite credenciales (cookies, encabezados de autorización) con "*" en allowedOrigins
+                .allowedOrigins("http://localhost:3000", "http://localhost:5173", "https://sistema-sporte-de-decisiones-web.vercel.app","https://sistema-sporte-de-decisiones.ghs21.online")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
