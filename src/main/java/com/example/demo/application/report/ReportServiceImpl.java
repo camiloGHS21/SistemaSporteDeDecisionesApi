@@ -97,12 +97,7 @@ public class ReportServiceImpl implements ReportService {
         }
         informePaisComparacionRepository.saveAll(paisesComparacion);
 
-        if (request.getPaisPrincipal() != null && !request.getPaisPrincipal().isEmpty()) {
-            return generateGapAnalysisPdf(request, user);
-        }
-
         List<String> indicadores = request.getIndicadores() != null ? request.getIndicadores() : new ArrayList<>();
-        
         List<String> upperCasePaises = allPaises.stream().map(String::toUpperCase).collect(Collectors.toList());
         List<String> upperCaseIndicadores = indicadores.stream().map(String::toUpperCase).collect(Collectors.toList());
         List<DatoIndicador> datos = datoIndicadorRepository.findByUserAndPaisesAndIndicadores(user, upperCasePaises, upperCaseIndicadores);
@@ -110,7 +105,11 @@ public class ReportServiceImpl implements ReportService {
         if ("CSV".equalsIgnoreCase(request.getReportType())) {
             return generateCsv(datos);
         } else {
-            return generateComparativePdf(request, datos);
+            if (request.getPaisPrincipal() != null && !request.getPaisPrincipal().isEmpty()) {
+                return generateGapAnalysisPdf(request, user);
+            } else {
+                return generateComparativePdf(request, datos);
+            }
         }
     }
 

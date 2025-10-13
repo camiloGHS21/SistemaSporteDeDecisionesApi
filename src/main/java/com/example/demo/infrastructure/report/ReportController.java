@@ -58,7 +58,7 @@ public class ReportController {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", filename + ".pdf");
         } else if ("CSV".equalsIgnoreCase(request.getReportType())) {
-            headers.setContentType(MediaType.TEXT_PLAIN);
+            headers.setContentType(MediaType.parseMediaType("text/csv"));
             headers.setContentDispositionFormData("attachment", filename + ".csv");
         } else {
             headers.setContentType(MediaType.APPLICATION_PDF);
